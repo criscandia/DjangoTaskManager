@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+import datetime
 
 # Create your views here.
 def index(request):
@@ -73,4 +74,9 @@ def logout_view(request):
         # Eliminar la cookie de autenticación
         return redirect("login")
     return redirect ("index")
-        
+
+def task_duedate_reminder(request):
+    today = datetime.date.today()
+    tasks = Task.objects.filter(due_date__lt=today)
+    data = {"tasks": tasks}
+    return render(request, "app/task-duedate-reminder.html", data)
