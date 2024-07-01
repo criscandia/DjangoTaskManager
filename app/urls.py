@@ -41,5 +41,7 @@ urlpatterns = [
     path('api/register/', RegisterUserView.as_view(), name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('task-duedate-reminder/', views.task_duedate_reminder, name='task_duedate_reminder')
+    path('task-duedate-reminder/', views.task_duedate_reminder, name='task_duedate_reminder'),
+    path('change-task-status/<int:task_id>/', views.change_task_status, name='change_task_status'),
+
 ]

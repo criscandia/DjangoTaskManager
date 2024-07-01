@@ -9,6 +9,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 import datetime
+from django.http import HttpResponse, HttpResponseNotAllowed
+from django.urls import reverse
+
+
 
 # Create your views here.
 def index(request):
@@ -26,11 +30,34 @@ def new_task(request):
     return render(request, "app/new-task.html", data)
         
         
+
+
 def task_list(request):
     tasks_list = Task.objects.all()
     data = {"tasks_list": tasks_list}
     return render(request, "app/task-list.html", data)
-    
+
+def change_task_status(request, task_id):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, id=task_id)
+        # Obtener el valor del select
+        completed = request.POST.get('completed') == 'True'
+        task.complete = completed
+        task.save()
+        # Generar el HTML del select actualizado
+        select_html = '''
+        <select name="completed" hx-post="{url}" hx-swap="outerHTML" hx-target="this">
+            <option value="True" {yes_selected}>Yes</option>
+            <option value="False" {no_selected}>No</option>
+        </select>
+        '''.format(
+            url=reverse('change_task_status', args=[task.id]),
+            yes_selected='selected' if task.complete else '',
+            no_selected='selected' if not task.complete else ''
+        )
+        return HttpResponse(select_html)
+    else:
+        return HttpResponseNotAllowed(['POST'])
 
 def edit_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -80,3 +107,5 @@ def task_duedate_reminder(request):
     tasks = Task.objects.filter(due_date__lt=today)
     data = {"tasks": tasks}
     return render(request, "app/task-duedate-reminder.html", data)
+
+
