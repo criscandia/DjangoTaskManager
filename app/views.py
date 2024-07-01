@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 def index(request):
@@ -66,3 +67,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 def login_view(request):
     return render(request, "app/login.html")
+
+def logout_view(request):
+    if request.method == "POST":
+        # Eliminar la cookie de autenticación
+        return redirect("login")
+    return redirect ("index")
+        
